@@ -1,0 +1,8 @@
+mobisys.pdf
+*.pdf
+*.docx
+mobisys.log
+mobisys.bbl
+mobisys.aux
+figures/android_smartsensor_architecture_proposed.png
+mobisys.synctex.gz

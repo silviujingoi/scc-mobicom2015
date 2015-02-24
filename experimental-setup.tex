@@ -1,0 +1,134 @@
+\section{Experimental Setup}
+\label{sec:experimentalSetup}
+
+We used trace based simulation to evaluate our accelerometer and 
+audio applications, running under several sensing configurations.
+
+\subsection{Trace Collection}
+\label{sec:traces}
+
+{\bf Audio traces} 
+We collected three half-hour audio traces in
+different environments: an office, a coffee shop and outdoors.  We
+used audio mixing software to add audio events of interest to the
+collected traces.  The audio events of interest include music (5\%
+of each trace), speech (5\% of each trace), and sirens (2\% of each 
+trace).  The events of interest were randomly selected from a library
+of audio files.
+
+{\bf Human accelerometer traces}
+In addition, we collected six hours of accelerometer traces from
+three different individuals while they perform routine daily
+activities: morning commute using public transit, working in a retail
+store, and working in an office.  Between 20\% and 37\% of each trace
+is spent walking.
+
+{\bf Robotic accelerometer traces} We collected synthetic traces by having 
+a robot perform multiple runs with a prototype smartphone attached 
+to its back.  For each run, the robot logged the start and end of each 
+action, which we use as the ground truth for our experiments.  The 
+smartphone ran an application that kept the device always awake and 
+continuously recorded accelerometer readings for all three axes. 
+
+In each run, the robot performed five different actions: standing
+idle, walking, sit-to-stand transitions, stand-to-sit transitions, and
+headbutts.  We created runs with three different levels of activity.
+Runs in groups 1, 2 and 3 spent 90\%, 50\% and 10\% of the time
+standing idle, respectively. The reminder of the time was allocated as
+follows: 73\% for walking, 24\% for transitions between sitting and
+standing, and 3\% for headbutts.  This setup allows us to experiment
+with detecting actions that are common, somewhat frequent, and rare.
+In total, the robot executed 18 different runs: 9 for group 1, 6
+for group 2 and 3 for group 3.  We generated more runs for groups 1
+and 2 because of the lower activity levels compared to group 3. To
+eliminate bias, the list of actions was generated randomly for each
+run, based on the expected probabilities of each action occurring.
+
+
+\subsection{Test Platform}
+\label{sec:testPlatform}
+
+To enable us to conduct controlled and repeatable experiments, we
+mounted the prototype smartphone on the back of an AIBO ERA 210 robot
+dog (see Figure~\ref{fig:aibo}).  Because the robot's actions can be
+scripted, this setup provides an efficient and reliable way to
+determine ground truth.  In contrast, labelling data collected from
+human subjects with ground truth is error prone and labour intensive.
+
+While our robotic testbed allows us to run 
+live experiments, we chose instead to use trace-based simulation for 
+several reasons.  First, it
+took the robot close to an hour to complete a single experiment.  A
+thorough exploration of the configuration space of the various sensing
+approaches we consider would have required months of continuous
+live experiments.  Moreover, taking fine grain power consumption
+measurements while the robot is in motion is not trivial.
+
+
+\subsection{Configurations}
+\label{sec:configurations}
+We used the simulator to evaluate the recall and precision of 
+our applications under the following configurations:
+
+\begin{itemize}
+
+\item {\bf Duty Cycling} The applications wake-up at fixed time 
+intervals to collect sensor data for 4 seconds and run the event 
+detection algorithms.  If an action is detected, the phone is 
+kept awake for another 4 seconds, and goes to sleep otherwise. 
+
+\iffalse
+\textbf{Duty Cycling} We modified the applications so that they check
+sensor readings periodically and then put the phone to sleep.  On
+wake-up, the phone is kept awake for 4 seconds in order to collect
+sensor data.  If an action is detected, the phone is kept awake for
+another 4 second, and goes to sleep otherwise.  This software only
+implementation runs on any mobile device and does not require special
+hardware support.
+\fi
+
+\item {\bf Batching} The applications wake-up at fixed time intervals to receive the batch of sensor data and run the event detection algorithms.
+
+\iffalse
+\textbf{Batching} This configuration emulates hardware support
+available on the Nexus 5 for collecting and batching accelerometer
+readings while the main processor sleeps.  The application wakes up
+periodically, reads the batch of sensor readings, runs the detection
+algorithm, and goes back to sleep.
+\fi
+
+\item {\bf Generic Wake-up Condition} This configuration simulates the Android's built-in significant motion detector.
+We constructed simple classifiers to wake up the device and run the applications when significant activity is detected (significant acceleration or sound).
+
+\item {\bf Simple Configurable Classifier} For each of the 
+applications, we constructed simple event classifiers to 
+wake up the device and run the event detection 
+applications.  A more detailed description of the 
+classifiers is available in Section~\ref{sec:classifiers}.
+
+\item {\bf Oracle} A hypothetical ideal implementation that only wakes up
+when the event of interest occurs.  Such a wake-up condition would
+achieve perfect detection precision and recall, with
+the lowest possible power consumption. The difference between the
+power consumption of this method and the SCC configuration
+provides an upper bound on the potential additional benefits of custom
+code offloading.
+  
+\end{itemize}
+
+\subsection{Metrics}
+
+For each sensing approach and trace, we measured the amount of sleep
+and awake time, the total number of wake-up events, and the recall and
+precision of the application.  Finally, we used an energy model
+derived from measurements of our prototype to estimate
+the average power consumption.  For the {\em Duty Cycling} experiments, 
+the power model accounts only for the energy
+consumption of the Nexus 4.  For {\em Batching} and {\em Generic Wake-up Condition},
+the model also includes the cost of the low-power TI MSP430
+micro-controller.  Finally, experiments configured to use {\em SCC} include the cost of 
+either the TI MSP430 or the TI Stellaris
+LM4F120H5QR, depending on the complexity of the algorithms used by the SCC.
+
+
+

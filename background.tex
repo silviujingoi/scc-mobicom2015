@@ -1,0 +1,156 @@
+\bgroup
+\def\arraystretch{1.5}
+\begin{table*}[t]
+\centering
+{\small
+	\begin{tabular}{|l|l|l|l|}
+	\hline
+	\multicolumn{2}{|l|}{\textbf{Approach}}                          
+	& \textbf{Advantages}                                                                                            
+	& \textbf{Disadvantages}                                                                                                                                                
+	\\ \hline
+	
+	\multicolumn{2}{|l|}{Always Awake}                               
+	& Highest Recall                                                                                                 
+	& Highest power consumption                                                                                                                                             
+	\\ \hline
+	
+	\multicolumn{2}{|l|}{Duty Cycling}                               
+	& Significant power savings                                                                                      
+	& \begin{tabular}[c]{@{}l@{}}Significant loss of event of interest recall\\ Power inefficient for infrequent events of interest\end{tabular}                            
+	\\ \hline
+	
+	\multicolumn{2}{|l|}{Batching}                      
+	& \begin{tabular}[c]{@{}l@{}}Significant power savings\\ Recall matching {\em Always Awake}\end{tabular}    
+	& \begin{tabular}[c]{@{}l@{}}Significant delay between occurrence and detection of events\\ Power inefficient for infrequent events of interest\end{tabular} 
+	\\ \hline
+	
+	\multicolumn{2}{|l|}{Computation Offloading}                     
+	& Significant power savings                                                                                      
+	& \begin{tabular}[c]{@{}l@{}}Programming complexity\\ Security concerns\\ Difficult to support multiple applications\end{tabular}                                       
+	\\ \hline
+	
+	\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Predefined Event\\ Wake-ups\end{tabular}} 
+	& \begin{tabular}[c]{@{}l@{}}High-level\\ activity\end{tabular} 
+	& \begin{tabular}[c]{@{}l@{}}Easy to use\\ High recall\\ Significant power savings\end{tabular}                  
+	& Only usable by a small set of applications                                                                                                                      
+	\\ \cline{2-4} 
+	& \begin{tabular}[c]{@{}l@{}}Significant\\ Motion\end{tabular} 
+	& \begin{tabular}[c]{@{}l@{}}Easy to use\\ High recall\end{tabular}       
+	& \begin{tabular}[c]{@{}l@{}}High proportion of unnecessary wake-ups when event of interest\\ is infrequent\end{tabular}     
+	\\ \hline
+	\end{tabular}
+}
+\caption{Advantages and disadvantages of existing continuous mobile sensing approaches.}
+\label{table:sensingApproachesSummary}
+\end{table*}
+\egroup
+
+\section{Background}
+\label{sec:background}
+
+This section overviews existing approaches for continuous mobile
+sensing.  The availability of some of these approaches depends on the
+mobile device's hardware and operating system.
+Table~\ref{table:sensingApproachesSummary} summarizes the main
+properties of the various approaches.
+
+\subsection{Always Awake}
+
+The basic approach for continuous sensing is to keep the mobile device
+\emph{always on}.  As an example, on the Android operating system, the
+sensing application acquires a wake-lock to prevent the device from
+sleeping and registers a listener for a specific sensor.  The benefit
+of this approach is that it achieves the highest possible accuracy
+because all the sensor data is delivered to the application.  However,
+the device cannot be placed in a sleeping state and hence, the power
+consumption of this approach is high.
+
+\subsection{Duty Cycling}
+
+To avoid keeping the device awake for extended periods of time,
+\emph{duty cycling} allows a device to sleep for fixed, usually
+regular, periods of time.  An Android application can implement
+duty cycling by scheduling a wake-up alarm using the system's alarm
+service and releasing all its current wake-locks.  When no
+application has a wake-lock, the operating system can power down the
+processor.  When the wake-up alarm fires, the processor wakes up and
+notifies the application.  Next, the application collects sensor
+readings for a short period of time, and then reschedules another
+alarm.
+
+Duty cycling has several drawbacks.  While the device is sleeping,
+events of interest will not be detected because the application does
+not receive any sensor data that were produced at those times.
+Additionally, during the short time periods when the device is awake
+and collecting sensor readings, the events of interest might not
+occur.  These power transitions are wasteful and expensive.
+Unfortunately, finding a good balance between accuracy and power
+savings depends on the specific application and the user's behavior.
+Another drawback of this approach is that it does not scale well with
+multiple applications.  It is possible for mutually unaware
+applications to implement conflicting wake-up schedules, resulting in
+little or no sleep.
+
+\subsection{Sensor Data Batching}
+
+An extension to duty cycling is \emph{sensor data batching} in which
+the device hardware is able to collect sensor readings while the main
+processor is asleep.  Upon wake-up, the entire batch of sensor data is
+delivered to the application(s) that registered a listener for that
+specific sensor.  Unlike duty cycling, batching requires hardware
+support (e.g., it is currently only available on the 
+Google Nexus 5 and 6, and the iPhone 5S, 6 and 6S), 
+but it enables applications to
+receive all the sensor data, and hence provides detection accuracy
+similar to the Always Awake approach.  However, batching affects
+detection timeliness.  Applications may detect events of interest many
+seconds after they actually occurred.  Also, as with the duty cycling
+approach, the device may wake up to find out that no events of
+interest have occurred in the current batch, which is wasteful.
+
+\subsection{Computation Offloading}
+\label{subsec:computationOffloading}
+
+Generalizing batching, a low-power peripheral processor can be used to
+collect and \emph{compute} on sensor data while the main processor is
+asleep~\cite{reflex,turducken}.  This approach allows developers to
+offload their own sensor data analysis algorithms to the peripheral
+processor, enabling arbitrarily rich sensing applications.  However,
+developers are exposed to the full complexity of the architecture,
+making application development more difficult.  Even simple
+sensor-driven applications have to be refactored into distributed
+programs, and the code that is offloaded has to be chosen
+carefully so that it can run in real time.  The latter is complicated
+because it depends on the type and functionality of the peripheral
+processor that is available.  As a result, multiple versions of the
+application may be required to handle hardware variations across
+phones.  Furthermore, this approach may create security concerns
+because applications are allowed to run arbitrary code on the
+peripheral processor.  Additionally, since each application is written independently,
+this approach makes it hard for multiple applications to program or
+use the same sensor.
+
+\subsection{Activity Detection}
+
+Given the challenges with full computation offloading, recent mobile
+devices limit offloading to a small, predefined set of \emph{activity
+detection} algorithms.  For example, the Motorola Moto 
+X~\cite{motox,x8mobile}
+uses two low-power peripheral processors to wake up the device when
+certain events occur.  A dedicated natural language processor is used
+to wake up the device when a user says the phrase ``OK Google Now''.  Also, 
+a contextual processor is used to turn on a part of the screen
+when the mobile device is taken out of a pocket, or start the camera
+application when it detects two twists of the wrist.  Additionally, 
+Android 4.4~\cite{android4.4} and Apple's CoreMotion~\cite{coreMotion} 
+framework supports specific wake-up
+events based on detecting ``significant motion'' or steps, if the device
+has the appropriate sensors.  However, the application developer has no
+control over the underlying activity detection algorithms, including
+customization of parameters.  This approach is easy to use, and it
+provides good energy savings because the device only wakes up when the
+event of interest occurs.  However, it only works for applications that
+can take advantage of the predefined set of activities, limiting the
+number and types of applications that can be supported.
+

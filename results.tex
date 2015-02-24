@@ -1,0 +1,163 @@
+\input{tableRecallAndPower}
+
+\section{Results}
+\label{sec:results}
+
+In this section we present the results of simulations conducted
+on the accelerometer and audio traces described in 
+Section~\ref{sec:traces}.  We answer the following questions:
+
+\begin{enumerate}
+\setlength{\itemsep}{-3pt}  
+
+\item What are the benefits of SCC over Duty Cycling and
+  Batching?
+
+\item Is a generic wake-up condition a good solution for multiple 
+  applications?
+
+\item How much additional benefit can be obtained from fully
+  programmable wake-up conditions?
+
+\item How important is it to let the applications configure
+  the processing algorithms' parameters?
+
+\item How representative are the accelerometer experiments on 
+  the AIBO of expected performance with humans?
+  
+\end{enumerate}
+
+Table~\ref{table:summaryRecallPower} presents the results of replaying
+the synthetic traces under the various sensing configurations.  For 
+each application, the table
+presents average power consumption and activity recall.  Results are
+averages across runs of the same group.  All sensing approaches achieved similar
+average precision (Headbutts: 89\%, Transitions: 91\%, Walking:
+93\%), and we therefore do not include these numbers in the table.
+
+Table~\ref{table:macrobenchmarksAudio} shows the average results from running the
+the simulations on the collected audio traces.  We omitted the results
+for Duty Cycling and Batching because they are similar to the results from
+the simulations on accelerometer traces.
+
+\subsection{SCC vs. Duty Cycling and Batching}
+
+As expected, Duty Cycling performs poorly.  Short sleep intervals
+actually result in an increase in power consumption (339 mW compared to an
+average of 323 mW to keep the device continuously awake) due to frequent
+transitioning between awake and asleep states.  Longer sleep interval
+are more effective at saving energy, but they do so by sacrificing
+recall.  For example, a sleep interval of 10 seconds reduces the
+Headbutts and Transitions recall bellow 30\%.
+
+Batching achieves perfect recall, but requires long
+batching intervals to achieve large energy savings.  Therefore, this
+approach is not appropriate for applications with timeliness
+constrains.  For example, the user of a gesture recognition
+application~\cite{liu2009uwave,schlomer2008gesture} would not be
+satisfied if the application detects the performed gesture after a
+delay of more than a couple of seconds.  We anticipate that in
+practice realistic batching intervals are in the order of a few
+seconds, depending on the sensor data acquisition rate and the size
+of the data buffer.  Additionally, the device often wakes up to find 
+out that no 
+events occurred in the current batch. We therefore conclude that 
+batching will result in significant energy waste for applications 
+interested in low frequency events (e.g., gesture recognition, fall 
+detection).
+
+SCC can achieve perfect recall while reducing average power consumption
+in all scenarios other than step detection
+in Group 3, where walking represents 63\% of the trace and the device
+experiences little sleep.  SCC performed best when the event
+of interest occurs infrequently, reducing power consumption by up to
+94\%.  
+
+
+\subsection{SCC vs. Generic Wake-up Condition}
+
+For the simulations with a generic wake-up condition, we performed a search
+of the parameter space in order to determine the best thresholds for 
+significant acceleration and sound 
+intensity.  The tables display the results for choosing the thresholds that
+minimize power consumption, while maintaining 100\% detection recall.
+The parameters used in this scenario are over-fitted to the test data, and 
+may result in imperfect event recall for different traces.  Therefore, 
+in practice, a generic wake-up condition would be more 
+lenient (such that it doesn't miss any events of interest), but also consume
+more power due to an increased number of unnecessary wake-ups.
+
+As expected, the power consumption resulting from the use of a 
+wake-up condition trigged by significant activity is 
+proportional to the amount of activity in the trace.  
+
+In the accelerometer simulations, this approach
+achieves power savings comparable to SCC for step detection (the most
+common activity), but significantly higher power consumption for
+headbutt or transition detection.  In the simulations performed on 
+the audio traces, SCC performs better than the generic wake-up 
+condition for 2 out of the 3 activities.  Due to the higher complexity 
+of the SCC used for siren detection, the power consumption model had
+to account for the powerful Stellaris LM4F120H5QR micro-controller instead of
+the MSP430, resulting in an increase in average power consumption by 
+more than 40 mW.
+
+We conclude that using a generic wake-up condition
+would be inefficient for infrequent events of interest, as the device
+is unnecessarily woken up whenever any other significant event occurs.
+
+
+\subsection{SCC vs. Oracle}
+
+By comparing the performance of the SCC approach to Oracle we
+observe that for most usage scenarios, the SCC approach
+achieves over 90\% of the available power
+savings\footnote{$Available\:Savings=Always\:Awake - Oracle$}.
+We conclude that a system that allows custom code offloading 
+to the low-power processor can achieve minimal
+additional power savings.
+
+For phrase detection, the difference in power consumption between SCC and
+the Oracle is attributed to the design of the simple classifier.  The Oracle 
+only wakes up when the phrase of interest occurs (<1\% of each trace), while
+the SCC is detecting speech segments (approximately 5\% of each trace).
+
+\subsection{SCC: Algorithm Parameter Configuration}
+
+Figure~\ref{fig:wucHeadbuttFFTRecallPowerGroup3} uses the Headbutts
+application to illustrate the importance of parameter configuration.  
+To obtain these results, we varied the value of the threshold used
+in the admission control algorithm.  A threshold that is too strict 
+causes a significant drop-off in the
+achieved recall.  However, a threshold that is too lenient results in
+additional power consumption without any extra benefit to recall
+because of unnecessary wake-ups.
+
+
+\begin{figure}[h]
+	\includegraphics[width=3.1in]{wuc_hb_fft_group3.png}
+	\caption{Parameter configuration sensitivity for the Headbutts SCC.}
+    \label{fig:wucHeadbuttFFTRecallPowerGroup3}
+\end{figure}
+
+
+\subsection{Comparison of results for Synthetic and Human Traces}
+
+Table~\ref{table:macrobenchmarksAccel} shows the results from running the
+step detector application on traces collected from three human
+subjects.  Since these traces are not annotated with ground truth, we
+use the steps detected by a {\em Always Awake} configuration as the baseline for
+determining recall.
+
+The results from these experiments show very similar
+benefits to the synthetic experiments for runs with low and medium
+levels of activity.  For example, the SCC approach achieves
+at least 91\% of the available power saving in each of the traces.  
+
+Additionally, we note that the generic wake-up condition performs poorly.  We 
+attribute the relatively high power consumption to the fact the human subjects 
+were performing a wide range of activities.  While most of the activities were 
+not events of interest, they resulted in unnecessary wake-ups.
+
+
+

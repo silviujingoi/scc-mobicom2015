@@ -1,0 +1,125 @@
+\bgroup
+\def\arraystretch{1.5}
+\begin{table}[t]
+\begin{threeparttable}
+\centering
+{\small
+	\begin{tabular}{|l|c|c|c|}
+	\hline
+	\textbf{Wake-up Mechanism}     & \textbf{Sirens}   & \textbf{Music}   & \textbf{Phrase} \\ \hline
+	Oracle                         & 16.8              & 27.2             & 14.7            \\ \hline
+	Significant Sound Intensity    & 51.9              & 51.9             & 51.9            \\ \hline
+	Simple Configurable Classifier & 63.1\tnote{*}    & 32.3             & 35.6            \\ \hline         
+	\end{tabular}
+	\begin{tablenotes}
+		\item{*} Includes the power consumption of the Stellaris LM4F120H5QR
+	\end{tablenotes}
+}
+\caption{Average power consumption for the audio applications.  Values measured in milliwatts.}
+\label{table:macrobenchmarksAudio}
+\end{threeparttable}
+\end{table}
+\egroup
+
+\bgroup
+\def\arraystretch{1.5}
+\begin{table*}
+\centering
+{\small
+    \begin{tabular}{|l|l|c|c|c|c|c|c|c|}
+    \hline
+	\multirow{2}{*}{~}			& \multirow{2}{*}{\bf Approach}	& \multirow{2}{*}{\parbox{2.1cm}{\bf Sleep Interval (seconds)}}	
+																						& \multicolumn{3}{c|}{\bf Average Power (mW)}		& \multicolumn{3}{c|}{\bf Recall} 													\\ \cline{4-9}
+								&								&						& {\bf Steps}	& {\bf Headbutts}	& {\bf Transitions}	& {\bf Steps}	& {\bf Headbutts}	& {\bf Transitions} 				\\ \hline
+	\multirow{14}{*}{\parbox{1.2cm}{Group 1 90\% idle}}	
+								& \multirow{5}{*}{Duty Cycling}	& 2						& \multicolumn{3}{c|}{339}				& 94\%					& 57\%						& 97\%						\\ \cline{3-9}
+								& 								& 5						& \multicolumn{3}{c|}{217}				& 82\%					& 14\%						& 47\%						\\ \cline{3-9}
+								& 								& 10					& \multicolumn{3}{c|}{140}				& 63\%					& 29\%						& 28\%						\\ \cline{3-9}
+								& 								& 20					& \multicolumn{3}{c|}{86.3}				& 48\%					& 14\%						& 32\%						\\ \cline{3-9}
+								& 								& 30					& \multicolumn{3}{c|}{63.1}				& 31\%					& 7\%						& 12\%						\\ \cline{2-9}
+								
+								& \multirow{5}{*}{Batching}		& 2						& \multicolumn{3}{c|}{350}				& \multirow{8}{*}{100\%}& \multirow{8}{*}{100\%}	& \multirow{8}{*}{100\%}	\\ \cline{3-6}
+								& 								& 5						& \multicolumn{3}{c|}{186}				&						&							&							\\ \cline{3-6}
+								& 								& 10					& \multicolumn{3}{c|}{115}				&						&							&							\\ \cline{3-6}
+								& 								& 20					& \multicolumn{3}{c|}{80.1}				&						&							&							\\ \cline{3-6}
+								& 								& 30					& \multicolumn{3}{c|}{68.3}				&						&							&							\\ \cline{2-6}
+								
+								& \multicolumn{2}{l|}{Significant Motion}				& \multicolumn{3}{c|}{67.5}				& 						& 							& 							\\ \cline{2-6}
+								& \multicolumn{2}{l|}{Simple Configurable Classifier}	& 48.3		& 23.3		& 18.6			& 						& 							& 							\\ \cline{2-6}
+								& \multicolumn{2}{l|}{Oracle}							& 41.5		& 21.6		& 16.4			& 						& 							& 							\\ \hline \hline
+								
+	\multirow{14}{*}{\parbox{1.2cm}{Group 2 50\% idle}}
+								& \multirow{5}{*}{Duty Cycling}	& 2						& \multicolumn{3}{c|}{334}				& 92\%					& 74\%						& 90\%						\\ \cline{3-9}
+								& 								& 5						& \multicolumn{3}{c|}{243}				& 79\%					& 31\%						& 53\%						\\ \cline{3-9}
+								& 								& 10					& \multicolumn{3}{c|}{176}				& 65\%					& 20\%						& 36\%						\\ \cline{3-9}
+								& 								& 20					& \multicolumn{3}{c|}{106}				& 33\%					& 5\%						& 10\%						\\ \cline{3-9}
+								& 								& 30					& \multicolumn{3}{c|}{80}				& 25\%					& 11\%						& 12\%						\\ \cline{2-9}
+								
+								& \multirow{5}{*}{Batching}		& 2						& \multicolumn{3}{c|}{350}				& \multirow{8}{*}{100\%}& \multirow{8}{*}{100\%}	& \multirow{8}{*}{100\%}	\\ \cline{3-6}
+								& 								& 5						& \multicolumn{3}{c|}{186}				&						&							&							\\ \cline{3-6}
+								& 								& 10					& \multicolumn{3}{c|}{115}				&						&							&							\\ \cline{3-6}
+								& 								& 20					& \multicolumn{3}{c|}{80.1}				&						&							&							\\ \cline{3-6}
+								& 								& 30					& \multicolumn{3}{c|}{68.3}				&						&							&							\\ \cline{2-6}
+								
+								& \multicolumn{2}{l|}{Significant Motion}				& \multicolumn{3}{c|}{196}				& 						& 							& 							\\ \cline{2-6}
+								& \multicolumn{2}{l|}{Simple Configurable Classifier}	& 188		& 45.3		& 43.3			& 						& 							& 							\\ \cline{2-6}
+								& \multicolumn{2}{l|}{Oracle}							& 153		& 42.2		& 29.5			& 						& 							& 							\\ \hline \hline
+
+	\multirow{14}{*}{\parbox{1.2cm}{Group 3 10\% idle}}
+								& \multirow{5}{*}{Duty Cycling}	& 2						& \multicolumn{3}{c|}{332}				& 89\%					& 47\%						& 89\%						\\ \cline{3-9}
+								& 								& 5						& \multicolumn{3}{c|}{257}				& 76\%					& 28\%						& 26\%						\\ \cline{3-9}
+								& 								& 10					& \multicolumn{3}{c|}{198}				& 64\%					& 27\%						& 25\%						\\ \cline{3-9}
+								& 								& 20					& \multicolumn{3}{c|}{133}				& 42\%					& 19\%						& 19\%						\\ \cline{3-9}
+								& 								& 30					& \multicolumn{3}{c|}{99.1}				& 30\%					& 9\%						& 14\%						\\ \cline{2-9}
+								
+								& \multirow{5}{*}{Batching}		& 2						& \multicolumn{3}{c|}{350}				& \multirow{8}{*}{100\%}& \multirow{8}{*}{100\%}	& \multirow{8}{*}{100\%}	\\ \cline{3-6}
+								& 								& 5						& \multicolumn{3}{c|}{186}				&						&							&							\\ \cline{3-6}
+								& 								& 10					& \multicolumn{3}{c|}{115}				&						&							&							\\ \cline{3-6}
+								& 								& 20					& \multicolumn{3}{c|}{80.1}				&						&							&							\\ \cline{3-6}
+								& 								& 30					& \multicolumn{3}{c|}{68.3}				&						&							&							\\ \cline{2-6}
+								
+								& \multicolumn{2}{l|}{Significant Motion}				& \multicolumn{3}{c|}{318}				& 						& 							& 							\\ \cline{2-6}
+								& \multicolumn{2}{l|}{Simple Configurable Classifier}	& 311		& 65.7		& 51.7			& 						& 							& 							\\ \cline{2-6}
+								& \multicolumn{2}{l|}{Oracle}							& 266		& 62.9		& 34.9			& 						& 							& 							\\ \hline
+    \end{tabular}
+}
+	\caption{Event recall and average power for synthetic traces.}
+	\label{table:summaryRecallPower}
+\end{table*}
+\egroup
+
+\bgroup
+\def\arraystretch{1.5}
+\begin{table*}[t]
+\centering
+{\small
+    \begin{tabular}{|l|c|c|c|c|c|c|}
+    \hline
+	\multirow{3}{*}{\bf Approach}	& \multirow{3}{*}{\parbox{2.1cm}{\bf Sleep Interval (seconds)}}
+												& \multicolumn{3}{c|}{\bf Average Power (mW)}
+																								& \multirow{3}{*}{\bf Average Recall} \\ \cline{3-5}
+									&			& {\bf Trace 1}	& {\bf Trace 2}	&{\bf Trace 3}	& 							\\ 
+									&			& 37\% walking	& 22\% walking	& 20\% walking	& \\ \hline
+	\multicolumn{2}{|l|}{Always Awake}			& \multicolumn{3}{c|}{323} 						& 100\% \\ \hline
+	\multirow{5}{*}{Duty Cycling}	& 2			& 329			& 330			& 330			& 97\%	\\ \cline{2-6}
+									& 5			& 272			& 260			& 261			& 92\%	\\ \cline{2-6}
+									& 10		& 220			& 195			& 198			& 82\%	\\ \cline{2-6}
+									& 20		& 172			& 131			& 134			& 66\%	\\ \cline{2-6}
+									& 30		& 148			& 104			& 106			& 57\%	\\ \hline
+	\multirow{5}{*}{Batching}		& 2			& \multicolumn{3}{c|}{350} 						& 100\% \\ \cline{2-6}
+									& 5			& \multicolumn{3}{c|}{186} 						& 100\% \\ \cline{2-6}
+	 								& 10		& \multicolumn{3}{c|}{115} 						& 100\% \\ \cline{2-6}
+	 								& 20		& \multicolumn{3}{c|}{80.1} 					& 100\% \\ \cline{2-6}
+	 								& 30		& \multicolumn{3}{c|}{68.3} 					& 100\% \\ \hline
+	\multicolumn{2}{|l|}{Significant Motion}	& 282			& 157			& 163			& 100\% \\ \hline
+	\multicolumn{2}{|l|}{SCC}					& 136			& 77.9			& 72.6			& 100\% \\ \hline
+	\multicolumn{2}{|l|}{Oracle}				& 117.8			& 65.8			& 62.3			& 100\% \\ \hline
+
+
+
+    \end{tabular}
+}
+	\caption{Event recall and average power for human traces.}
+	\label{table:macrobenchmarksAccel}
+\end{table*}
+\egroup

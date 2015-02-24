@@ -1,0 +1,50 @@
+\documentclass[letterpaper,twocolumn]{acm_proc_article-sp}
+
+\usepackage{color, soul, epsfig, morefloats, graphicx, lipsum, pdfpages, multirow, endnotes, url, pgfplots, threeparttable}
+
+\usetikzlibrary{patterns}
+
+\graphicspath{ {./figures/} }
+
+
+\begin{document}
+\pagenumbering{arabic}
+\date{}
+
+
+\title{Simple Configurable Classifiers: Energy-efficient sensing on mobile devices}
+
+\numberofauthors{6}
+
+\author{
+\alignauthor Silviu Jingoi\\
+       \affaddr{University of Toronto}
+\alignauthor Eyal de Lara\\
+       \affaddr{University of Toronto}
+\alignauthor Ashvin Goel\\
+       \affaddr{University of Toronto}
+\and
+\alignauthor Wilson To\\
+       \affaddr{University of Toronto}
+\alignauthor Kevin Lee\\
+       \affaddr{University of Toronto}
+\alignauthor Italo De Moraes Garcia\\
+       \affaddr{University of Toronto}
+}
+
+\maketitle
+
+\input{abstract}
+\input{introduction}
+%\input{background}
+\input{approach}
+\input{prototype}
+\input{experimental-setup}
+\input{results}
+\input{related}
+\input{conclusion}
+
+\bibliographystyle{abbrv}
+\bibliography{mobisys}
+
+\end{document}

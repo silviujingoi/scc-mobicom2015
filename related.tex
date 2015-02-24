@@ -1,0 +1,73 @@
+\section{Related Work}\label{sec:related}
+
+This work is an extension of our position paper~\cite{jingoiSCCposition}, 
+where we provided preliminary results showing the potential benefits
+of simple configurable classifiers. Our current work supplements our 
+previous findings through the development of
+a prototype system and an extensive evaluation using accelerometer 
+and audio applications.
+
+The idea of waking up a device when an event of interest occurs has been 
+around since the inception of mobile phones. The phone's radio 
+transceiver wakes up the device when an incoming call or a text message 
+is received~\cite{gobi}. Wake on Wireless~\cite{shih2002wake} extended this idea by 
+augmenting a PDA with a low-power radio that would send a wake-up message 
+when an incoming call is received. Similarly, Wake on WLAN
+~\cite{mishra2006wake} allows remote wake-up of wireless networking
+equipment.
+
+Turducken~\cite{turducken} generalizes the ``wake on event of interest'' 
+approach to several types of applications and to multiple components 
+operating at increasingly small power-levels. Little Rock~\cite{littlerock} 
+applies Turducken's multi-tiered architecture to sensing on mobile 
+devices. Reflex ~\cite{reflex} complements the idea proposed by Turducken 
+by providing a shared memory abstraction to be used by the different 
+processors.
+
+Simple Configurable Classifiers differ from these approaches by hiding the heterogeneous 
+nature of the system from the application developer. Creating an 
+application that makes use of SCC does not require 
+the developer to create any code that will run on the low-power 
+processor(s).  We limit the available interface in order to increase 
+portability, 
+while still achieving the majority of the potential power savings.
+
+Smartphone manufacturers have started to incorporate low-power
+processors into their architectures, but have only implemented limited
+APIs that provide fixed functionality.  Apple's M7 and M8 motion
+co-processors are used to collect, process, and store sensor data 
+even while the main CPU is asleep and applications can retrieve 
+historical motion data via the CoreMotion API~\cite{coreMotion}.  Some
+recent Android devices allow
+batching of sensor readings~\cite{android4.4}, and the
+Motorola Moto X provides recognition for a small number of predefined
+activities that can be used as wake-up 
+conditions~\cite{motox,x8mobile}.  While
+these wake-up conditions work well for some applications, they are
+inefficient for many other types of applications that are not
+interested in the set of predefined activities.
+
+Most of the previously noted works focused on system architecture 
+modification in order to lower the cost of sensing. Alternative 
+approaches have also been explored. Ace~\cite{ace} is a middleware that 
+supports continuous context-aware applications while mitigating sensing 
+cost for acquisition of context attributes (such as AtHome and IsDriving). 
+It achieves power savings when multiple applications request strongly 
+correlated context attributes. Additionally, it can reduce power 
+consumption when a ``cheaper'' sensor exists, which can determine the 
+value of a different context attribute that has a strong correlation with 
+the requested context attribute (e.g. use the accelerometer to check if 
+the user is jogging instead of using the GPS to determine if the user is 
+at work). A middleware such as Ace is a great example of a library that 
+can run on top of a Smartsensor architecture and achieve additional power savings. Sensor fusion 
+has also been an active focus of related research. Data from multiple 
+sensors can be used to increase context-awareness in mobile devices 
+\cite{gellersen2002multi,biegel2004framework}.
+
+While our focus was on power-efficient acquisition of sensor data, next 
+generation mobile perception applications face related problems regarding 
+partitioning of application code. MAUI~\cite{maui} enables fine-grained
+energy-aware offload of mobile application code to remote 
+servers. Similarly, Odessa~\cite{ra2011odessa} uses code-offloading to 
+address the issue of processing excessive amounts of sensor data on 
+resource constrained mobile devices.

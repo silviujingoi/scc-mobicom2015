@@ -1,0 +1,258 @@
+\section{Simple Configurable Classifiers}
+\label{sec:conjecture}
+
+Continuous mobile sensing approaches have to address 
+two main constraints: maximizing detection accuracy
+and minimizing energy consumption.  Users expect very
+high precision and recall (95\% or more) and user
+experience is adversely affected when the application
+misses or over-reports events of interest.  Achieving 
+both high recall and precision requires 
+highly specialized algorithms tuned to the event of 
+interest.  Specifically, getting the last few percentages
+points in precision and recall is difficult and requires
+complex algorithms and fine parameter 
+tuning.  This effectively means that an algorithm only
+works for a specific event.
+
+However, the two main goals (energy efficiency and high
+precision and recall) do not have to be achieved by a 
+monolithic algorithm.  A preliminary stage can be used
+to achieve the majority of available energy savings and 
+the main stage can target high detection precision and recall.
+
+We argue that continuous mobile sensing applications should be
+structured as a pair of classifiers of increasing complexity: a simple
+high recall and moderate precision classifier that runs continuously
+on low-power hardware, and acts as an energy efficient wake-up
+mechanism for a higher complexity classifier that runs on the main CPU
+and provides both high recall and high precision.
+
+We conjecture: 1) that it is possible to implement simple classifiers for a 
+wide range of applications by configuring a small set of common processing 
+algorithms; and  2) that this approach will achieve comparable energy 
+savings to an alternative implementation that supports full programmability.
+
+\subsection {Approach}
+
+\begin{figure}[t]
+	\centering
+	\includegraphics[width=3.1in]{architecture.png}
+	\caption{Proposed system architecture.}
+    \label{fig:architecture}
+\end{figure}
+
+
+\begin{figure*}[t]
+{\small
+	\begin{verbatim}
+	
+# segment sensor data in windows of size 512 and apply a low-pass filter
+$LPF = Filter(type=lowpass, cutoff=1000, rolloff=6, size=512)
+
+# feature extraction: zero-crossing rate over windows of size 512
+$ZCR = Aggregate(type=zcr, size=512)
+
+# threshold-based admission control to be applied to the extracted zero-crossing rate
+$AC = AdmissionControl(type=threshold, min=100, max=200)
+
+# Define data stream flows
+$DATA > $LPF > $ZCR > $AC
+
+Assert($AC)
+	\end{verbatim}
+}
+	\caption{Graph definition example}
+    \label{fig:sccLanguageSample}
+\end{figure*}
+
+
+\iffalse
+\begin{figure*}[t]
+{\small
+	\begin{verbatim}
+# segment sensor data and apply a low-pass filter
+$DATA > window type=rect size=512 overlap=256 | filter type=lowpass cutoff=1000 rolloff=6 > $lpfwin
+
+# extract the zero-crossing rate and perform threshold-based admission control
+$lpfwin > extract type=zcr | admissioncontrol type=threshold min=100 max=200 > $aczcr
+
+# check if admission control passed
+assert $aczcr
+
+# pass filtered sensor data to application
+return $lpfwin
+	\end{verbatim}
+}
+	\caption{Graph definition example}
+    \label{fig:sccLanguageSample}
+\end{figure*}
+\fi
+
+{\em Simple Configurable Classifiers} (SCC) is a new approach for
+continuous mobile sensing that divides the responsibility of
+energy-efficient event detection between the platform and
+the application developer.  The platform implements common sensor data
+processing algorithms that execute on a low-power sensor hub.
+Applications construct simple classifiers for events of interest by
+defining a directed acyclic graph using a set of pre-defined 
+algorithmic building blocks.  The vertices
+of the graph represent the data processing algorithms, and the 
+edges of the graph represent data flows; i.e. the output of an algorithm 
+becomes the input of one or more other algorithms.  This classifier 
+executes on the low-power sensor hub and, when events of interest 
+are detected, the main processor is woken up and the application 
+code is invoked.
+
+Figure~\ref{fig:architecture} shows the architecture of a
+system that features SCC.  Applications interact with a sensor 
+manager to define simple configurable classifiers.  We anticipate 
+that the platform will need to implement algorithms
+that perform windowing (e.g. rectangle, Hamming), filtering (e.g.
+noise reduction, low-pass, high-pass), transforms (e.g. Fast Fourier
+Transform), feature extraction (e.g. zero crossing rate) and admission
+control (e.g. thresholds).  The figure also shows that the 
+architecture supports recognition libraries that–]buzzpunk FaceIt Player 10 points 3 hours ago 
+V
+encapsulate the functionality of SCC to provide simple
+wake-up conditions and event detection for a large number of 
+activities. 
+
+  
+
+\subsection{Language}
+
+To define a SCC, developers can use a language similar to shell
+scripting.  Figure~\ref{fig:sccLanguageSample} shows a sample
+definition of a simple configurable classifier.  The first section is used
+to define and configure the necessary algorithms.  In the second section the
+{\em greater-than} character is used to define data flows between the 
+various algorithms. 
+
+\subsection{Advantages}
+
+SCC has many benefits:
+
+ {\bf Lower programming complexity}  Programming complexity is
+  decreased because application developers can use the pre-defined
+  processing algorithms, rather than implementing them themselves. 
+  Application developers need to select appropriate processing 
+  algorithms for their pipelines and configure their parameters. This 
+  is not unlike how shell programming is used to build complex 
+  pipelines by reusing existing command-line applications.
+  
+
+{\bf Better predictability} It 
+  creates predictable performance for the algorithms executed on the
+  low-power processor. Profiling each algorithm will provide metrics
+  about computational and time requirements, as well as power
+  consumption.  Predictable performance is important in order to
+  support multiple concurrent classifier executions or applications
+  that make use of multiple sensors.
+
+
+{\bf Better security} Providing access to these algorithms via
+  an API has significant security advantages over the fully
+  programmable offloading approach because application developers
+  cannot execute arbitrary code on the peripheral processor. 
+
+
+{\bf Improved Portability} Programmers do not have to be
+  aware of the specifics of the underlying hardware, nor create a version
+  for every type of sensor hub. Since the algorithms are
+  pre-specified, device manufacturers can optimize their
+  implementations for each low-power processor and sensor
+  implementation.
+
+
+
+\subsection{Current Challenges}
+\label{sec:currentChallenges}
+
+{\bf Identifying processing algorithms} Defining the appropriate
+set of algorithms that should be included in the API and executed on
+the low-power processor for each sensor is a key challenge. First,
+there is a trade-off between algorithm generality and accuracy.
+Simple generic algorithms can support a large set of
+applications, albeit no specific application is likely to experience
+optimal performance.  Conversely, a highly specialized algorithm may
+provide optimal performance but is only applicable to a limited set of
+applications.  Second, there is also a trade-off between algorithm
+complexity and power savings.  More complex algorithms can reduce
+energy consumption by preventing unnecessary wake-ups due to increased
+accuracy.  On the other hand, more complex algorithms have higher
+computational demands, which require a larger and hungrier peripheral
+processor.  
+
+While determining the complete set of 
+algorithms to be include as part of the platform is beyond the
+scope of this paper, we anticipate that it will include algorithms 
+such as the ones listed in Section~\ref{sec:sensorDataAlgorithms}.
+The list contains algorithms that were needed in order to construct
+the simple classifiers were examined in the evaluation.  To 
+determine an extensive list of 
+algorithms that should be included for each sensor, a wide variety
+of sensor-driven applications needs to be analysed.
+
+
+{\bf Access to sensor data} A related challenge is determining what
+data the sensor hub should pass to the application following a
+wake-up.  Some applications may be interested in the raw sensor data,
+while others may want to use the filtered data or extracted features.
+Our prototype includes an across-the-board solution that allows the 
+applications to specify what data they are interested in via the API.
+
+
+{\bf Configuring classifiers} After designing the simple 
+configurable classifiers we faced another challenge in determining 
+the optimal parameter configurations for each algorithm.  Since our
+classifiers were based on previously developed applications, we were
+able to reuse parameters for algorithms that were common for both the
+application and the classifier.  For other parameters, we ended up
+performing searches of the parameter space and choosing the parameters
+that generated the highest recall and precision.
+
+We believe application developers may
+face challenges in selecting the optimal algorithms and configuration
+parameters for their simple classifiers.  Given feedback from the
+application, self-learning mechanisms may be able to determine optimal
+configuration parameters for the algorithms used.  It is easy to 
+imagine an application notifying the
+sensor hub about wake-ups when events of interest were not actually
+detected (i.e. false positives).  However, it will be more difficult
+to automatically identify events of interest missed by the classifier
+running on the low-power node (i.e. false negatives).
+
+{\bf Sizing} When creating the sensor node of the prototype 
+implementation we evaluated two micro-controllers having 
+different power consumption levels.  We noticed that the lower 
+power micro-controller was not able to run some algorithms (such
+as Fast Fourier Transforms) in real-time. Determining the optimal 
+number, type and size of
+processors to include in the sensor hub is an open research question.
+Each sensor (or small group of related sensors) may be supported by
+its own dedicated low-power processor.  Alternatively, a larger
+processor could be used to serve the entire sensor hub.  Identifying a
+sweet spot between the maximum number of concurrent algorithm
+executions, energy budget, cost and physical size of the sensor node
+is an open challenge.
+
+
+\subsection{Further Challenges}
+\label{sec:furtherChallenges}
+
+{\bf Multi-application support} Another challenge lies in supporting
+multiple concurrent applications while still maintaining predictable
+performance.  This challenge is not unique to our approach; however,
+given that the algorithms in our approach are pre-defined, they can be
+profiled in terms of computational power requirements.  A resource
+manager would be required to orchestrate and synchronize concurrent
+requests from multiple applications.
+
+{\bf Sensor fusion} Fusing inputs from multiple sensors is a common
+technique used for improving the accuracy of sensing applications.
+Whether low power sensor hubs should include support for sensor
+fusion, however, is not clear.  On the one hand, such support could
+increase energy efficiency by reducing the occurrence of unnecessary
+wake-ups.  On the other, sensor fusion tends to be application specific
+and the added complexity may negate any energy benefits.

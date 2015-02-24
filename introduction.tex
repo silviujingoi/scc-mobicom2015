@@ -1,0 +1,194 @@
+\bgroup
+\def\arraystretch{1.5}
+\begin{table*}[t]
+\centering
+{\small
+	\begin{tabular}{|l|l|l|l|}
+	\hline
+	\multicolumn{2}{|l|}{\textbf{Approach}}                          
+	& \textbf{Advantages}                                                                                            
+	& \textbf{Disadvantages}                                                                                                                                                
+	\\ \hline
+	
+	\multicolumn{2}{|l|}{Always Awake}                               
+	& Highest Recall                                                                                                 
+	& Highest power consumption                                                                                                                                             
+	\\ \hline
+	
+	\multicolumn{2}{|l|}{Duty Cycling}                               
+	& Significant power savings                                                                                      
+	& \begin{tabular}[c]{@{}l@{}}Significant loss of event of interest recall\\ Power inefficient for infrequent events of interest\end{tabular}                            
+	\\ \hline
+	
+	\multicolumn{2}{|l|}{Batching}                      
+	& \begin{tabular}[c]{@{}l@{}}Significant power savings\\ Recall matching {\em Always Awake}\end{tabular}    
+	& \begin{tabular}[c]{@{}l@{}}Significant delay between occurrence and detection of events\\ Power inefficient for infrequent events of interest\end{tabular} 
+	\\ \hline
+	
+	\multicolumn{2}{|l|}{Computation Offloading}                     
+	& Significant power savings                                                                                      
+	& \begin{tabular}[c]{@{}l@{}}Programming complexity\\ Security concerns\\ Difficult to support multiple applications\end{tabular}                                       
+	\\ \hline
+	
+	\multirow{2}{*}{\begin{tabular}[c]{@{}l@{}}Predefined Event\\ Wake-ups\end{tabular}} 
+	& \begin{tabular}[c]{@{}l@{}}High-level\\ activity\end{tabular} 
+	& \begin{tabular}[c]{@{}l@{}}Easy to use\\ High recall\\ Significant power savings\end{tabular}                  
+	& Only usable by a small set of applications                                                                                                                      
+	\\ \cline{2-4} 
+	& \begin{tabular}[c]{@{}l@{}}Significant\\ Motion\end{tabular} 
+	& \begin{tabular}[c]{@{}l@{}}Easy to use\\ High recall\end{tabular}       
+	& \begin{tabular}[c]{@{}l@{}}High proportion of unnecessary wake-ups when event of interest\\ is infrequent\end{tabular}     
+	\\ \hline
+	\end{tabular}
+}
+\caption{Advantages and disadvantages of existing continuous mobile sensing approaches.}
+\label{table:sensingApproachesSummary}
+\end{table*}
+\egroup
+
+\section{\label{sec:Introduction}Introduction}
+
+Today, smartphones and tablets are used primarily to run interactive
+foreground applications, such as games and web browsers.  As a result,
+current mobile devices are optimized for a use case where applications
+are used intermittently during the day, in sessions that last for
+several minutes.  For example, during her break Alice picks up
+her phone, checks the weather, reads the latest news and plays a
+game for a few minutes, and then puts it away to go back to work.  To
+maximize battery life, current mobile devices are designed to go
+into sleep state for most of the day when they are not supporting such
+interactive usage.
+
+Unfortunately, most mobile platforms are a poor match for a growing
+class of mobile applications that perform continuous background
+sensing.  Examples range from context-aware applications~\cite{baldauf2007survey,hong2009context}, such as
+medical applications~\cite{hameed2003application,preuveneers2008mobile,tsai2007usability} that improve our
+well-being to applications that use participatory sensing to get a
+better understanding of the physical world, such as noise pollution
+monitoring~\cite{maisonneuve2009citizen,maisonneuve2009noisetube} or 
+traffic prediction~\cite{hull2006cartel}.  While the processing demands of
+these applications are modest most of the time, they require periodic
+collection of sensor readings.  An application that implements continuous 
+sensing using an {\bf always awake} approach can achieve the highest possible 
+accuracy because it receives all the sensor data.  However, the power
+consumption of such an approach is very high.  
+
+An alternative approach, {\bf duty cycling}, allows a device to sleep for fixed, usually
+regular, periods of time.  An application can use the system's alarm
+service to schedule regular wake-ups.  After a wake-up, the application
+collects sensor readings for a short period of time, before
+allowing the device to go back to sleep.  While duty cycling can achieve
+significant power savings, it has 
+several drawbacks.  While the device is sleeping,
+events of interest will not be detected because the application does
+not receive any sensor data.
+Additionally, during the short time periods when the device is awake
+and collecting sensor readings, the events of interest might not
+occur.  These power transitions are wasteful and expensive.  Another 
+drawback of this approach is that it does not scale well with
+multiple applications.  It is possible for mutually unaware
+applications to implement conflicting wake-up schedules, resulting in
+little or no sleep.
+
+{\bf Sensor data batching} is an extension of duty cycling in which
+the device hardware is able to collect sensor readings while the main
+processor is asleep.  Upon wake-up, the entire batch of sensor data is
+delivered to the application(s) that requested data from that
+specific sensor.  Unlike duty cycling, batching requires hardware
+support, but it enables applications to receive all the sensor data, 
+and hence provides detection accuracy similar to the always awake 
+approach.  However, batching affects detection 
+timeliness.  Applications may detect events of interest many seconds 
+after they actually occurred.  Also, as with the duty cycling
+approach, the device may wake up to find out that no events of
+interest have occurred in the current batch, which is wasteful.
+
+To improve support for continuous sensing applications the research
+community has proposed the use of {\bf fully progra\-mmable heterogeneous
+architectures}~\cite{reflex,littlerock,turducken}.  In these
+approaches, developers offload their own sensor data analysis 
+algorithms to a low-power processor (or a hierarchy of processors), 
+enabling arbitrarily rich sensing applications.  When the code running 
+on the low-power processor detects the occurrence of an event of 
+interest, it proceeds to wake up the phone and passes control to the 
+rest of the application.  While the ability to run custom code on the 
+low-power hardware provides great flexibility, the significant complexity
+inherent in this approach has so far prevented its adoption in
+commercial devices.  Furthermore, this approach may create security concerns
+because applications are allowed to run arbitrary code on the
+peripheral processor.  Additionally, since each application is written independently,
+this approach makes it hard for multiple applications to program or
+use the same sensor.  
+
+Instead, smartphone manufacturers, realizing the
+potential of sensing applications, have recently incorporated
+low-power processors into their architectures, but have limited
+application developers to APIs that provide a limited set of 
+{\bf predefined event detection} algorithms that can be used as wake-up
+conditions~\cite{androidMotionSensors,coreMotion}.  For example, 
+the Motorola Moto X~\cite{motox,x8mobile} uses a dedicated natural language processor
+to wake up the device when the user says the phrase ``OK Google Now''.  Also, 
+a contextual processor is used to turn on a part of the screen
+when the mobile device is taken out of a pocket, or start the camera
+application when it detects two twists of the wrist.  Additionally, 
+Android 4.4~\cite{android4.4} and Apple's CoreMotion~\cite{coreMotion} 
+framework supports specific wake-up
+events based on detecting ``significant motion'' or steps, if the device
+has the appropriate sensors.  However, application developers have no
+control over the underlying activity detection algorithms, including
+customization of parameters.  This approach is easy to use, and it
+can provide good energy savings.  However, it only works for applications that
+can take advantage of the predefined set of activities, limiting the
+number and types of applications that can be supported.
+
+This paper proposes {\em Simple Configurable Classifiers} (SCC), a new
+approach for continuous mobile sensing that splits the work of
+energy-efficient event detection between the platform and the
+application developer.  In the new approach, the platform implements
+common sensor data processing algorithms (e.g., windowing, noise 
+reduction, feature extraction, admission control) that execute on a 
+low-power sensor hub, and application developers construct simple 
+classifiers for events of interest by selecting among the set of
+pre-defined common processing algorithms and tuning their
+parameters.  The simple classifiers execute on the
+low-power sensor hub and, when events of interest are detected, the
+main processor is woken up and the rest of the application code is
+invoked.
+  
+We argue that SCC provides a better
+balance between flexibility and ease of deployment than existing
+approaches.  The approach empowers developers to create a broad set of
+event classifiers that can be used to detect a wide range of
+activities.  Simultaneously, these classifiers are significantly
+easier to program compared to fully programmable offloading.
+Moreover, since the algorithms are pre-specified, their
+implementations can be optimized (by the device manufacturer) for each
+low-power processor, improving application portability between
+devices.  
+
+To evaluate the benefits of SCC, we developed applications that use 
+accelerometer readings or audio data to detect several events of 
+interest.  Additionally, we built a prototype implementation that extends 
+a Nexus 4 phone with a low-power sensor board.  To enable us to 
+conduct controlled and repeatable experiments,
+we mounted the prototype on an AIBO ERA 210 robot dog.  Simulations 
+conducted on accelerometer traces collected with this setup,
+as well as accelerometer traces collected from human subjects and audio
+traces collected in various environments, show that
+SCC can reduce the average energy required to run continuous
+sensing applications by up to 94\%, while matching the detection recall
+and precision of an approach that keeps the phone awake at all times.
+Moreover, for most of our usage scenarios, the SCC approach
+achieves over 90\% of the power savings achieved by a ``perfect''
+wake-up mechanism, indicating that an implementation that supports
+custom code offloading will achieve only marginal additional
+improvements.
+
+The rest of this paper is organized as follows.  Sections~\ref{sec:conjecture}
+and~\ref{sec:prototype} describe our new approach for continuous sensing
+and our prototype.  Sections~\ref{sec:experimentalSetup} 
+and~\ref{sec:results} present our
+experimental setup and the results from our evaluation.  Finally,
+Sections~\ref{sec:related} and~\ref{sec:conclusion} describe our work
+in the context of related work and conclude the paper.
+
